@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu } from 'electron'
 import path from 'path'
 import { Pool } from 'pg'
 import dotenv from 'dotenv'
@@ -14,25 +14,62 @@ let mainWindow: BrowserWindow | null = null
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 700,
+    minWidth: 800,
+    minHeight: 600,
+    center: true,
+    title: 'Sistema de Empréstimo de Livros',
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
   })
-
+  mainWindow.once('ready-to-show', () => {
+    mainWindow?.show()
+  })
   // Se estiver em desenvolvimento, usa a URL do Vite. Em produção, carrega o arquivo compilado.
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL)
+    mainWindow.webContents.openDevTools()
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
   }
 }
 
+function criarMenu() {
+  const template: Electron.MenuItemConstructorOptions[] = [
+    {
+      label: 'Arquivo',
+      submenu: [
+        {
+          label: 'Sair',
+          role: 'quit',
+        },
+      ],
+    },
+    {
+      label: 'Ajuda',
+      submenu: [
+        {
+          label: 'Sobre',
+          click: () => {
+            console.log('Sistema de Empréstimo de Livros - Projeto Integrador UC5')
+          },
+        },
+      ],
+    },
+  ]
+
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
+}
+
 app.whenReady().then(async() => {
   createWindow()
+  criarMenu()
 
   try {
     const resultado = await pool.query('SELECT NOW()')
@@ -52,6 +89,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+app.on('before-quit', async () => {
+  console.log('Fechando a conexao com o banco de dados')
 })
 
 // Manipulador IPC Exemplo
