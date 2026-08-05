@@ -4,6 +4,8 @@ declare global {
   interface Window {
     api: {
       ping: () => Promise<string>;
+      listarLivros: () => Promise<any[]>
+      cadastrarLivros: (livro: {titulo: string, autor: string, isbn: string}) => Promise<any>
     };
   }
 }
@@ -11,25 +13,54 @@ declare global {
 const appElement = document.getElementById('app') as HTMLDivElement
 
 appElement.innerHTML = `
-  <h1>Projeto Base Electron + Vite + TS</h1>
-  <button id="btn-ping">Enviar Ping IPC</button>
-  <p id="resposta">Aguardando interação...</p>
+  <h1>Sistema de Empréstimo de Livros</h1>
+
+  <h2>Cadastrar Livro</h2>
+  <form id="form-livro">
+    <input type="text" id="titulo" placeholder="Título" required />
+    <input type="text" id="autor" placeholder="Autor" required />
+    <input type="text" id="isbn" placeholder="ISBN" required />
+    <button type="submit">Cadastrar</button>
+  </form>
+  <p id="mensagem-livro"></p>
+
+  <h2>Livros Cadastrados</h2>
+  <ul id="lista-livros"></ul>
 `
 
-const button = document.getElementById('btn-ping') as HTMLButtonElement
-const resposta = document.getElementById('resposta') as HTMLParagraphElement
+const formLivro = document.getElementById('form-livro') as HTMLFormElement
+const mensagemCadastro = document.getElementById('mensagem-livro') as HTMLParagraphElement
+const listaLivros = document.getElementById('lista-livros') as HTMLUListElement  
 
-button.addEventListener('click', async () => {
-  resposta.textContent = 'Enviando ping...'
+async function carregarLivros() {
   try {
-    const retorno = await window.api.ping()
-    resposta.textContent = `Resposta: ${retorno}`
+    const livros = await window.api.listarLivros()
+    listaLivros.innerHTML = livros
+      .map((livro) => `<li>${livro.titulo} - ${livro.autor} (${livro.disponivel ? 'Disponível' : 'Emprestado'})</li>`)
+      .join('')
   } catch (erro) {
-    resposta.textContent = 'Erro ao enviar IPC.'
+    listaLivros.innerHTML = '<li>Erro ao carregar livros.</li>'
+    console.error(erro)
+  }
+}
+
+formLivro.addEventListener('submit', async (evento) => {
+  evento.preventDefault()
+
+  const titulo = (document.getElementById('titulo') as HTMLInputElement).value
+  const autor = (document.getElementById('autor') as HTMLInputElement).value
+  const isbn = (document.getElementById('isbn') as HTMLInputElement).value
+
+  try {
+    await window.api.cadastrarLivros({ titulo, autor, isbn })
+    mensagemCadastro.textContent = 'Livro cadastrado com sucesso!'
+    formLivro.reset()
+    carregarLivros()
+  }  catch (erro) {
+    mensagemCadastro.textContent = 'Erro ao cadastrar livro.'
     console.error(erro)
   }
 })
+carregarLivros()
 
-// Necessario para que o TypeScript trate este arquivo como modulo ES,
-// tornando o 'declare global {}' acima valido.
 export {}

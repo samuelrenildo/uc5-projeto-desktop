@@ -99,3 +99,29 @@ app.on('before-quit', async () => {
 ipcMain.handle('canal-ping', async () => {
   return 'pong do processo principal!'
 })
+
+
+ipcMain.handle('livros:listar', async () => {
+  try {
+    const resultado = await pool.query('SELECT * FROM livros')
+    return resultado.rows
+  } catch (erro) {
+    console.error('Erro ao listar livros:', erro)
+    throw erro
+  }
+})
+
+ipcMain.handle('livros:cadastrar', async (_evento, livro: {titulo: string, autor: string, isbn: string}) => {
+  try {
+    const resultado = await pool.query(
+      'insert into (titulo, autor, isbn) values ($1, $2, $3) returning *',
+      [livro.titulo, livro.autor, livro.isbn]
+    )
+    return resultado.rows[0]
+  } catch (erro) {
+    console.error('Erro ao cadastrar livro:', erro)
+    throw erro
+  }
+})
+
+
