@@ -6,6 +6,7 @@ declare global {
       ping: () => Promise<string>;
       listarLivros: () => Promise<any[]>
       cadastrarLivros: (livro: {titulo: string, autor: string, isbn: string}) => Promise<any>
+      listarGeneros: () => Promise<string[]>
     };
   }
 }
@@ -26,6 +27,9 @@ appElement.innerHTML = `
 
   <h2>Livros Cadastrados</h2>
   <ul id="lista-livros"></ul>
+
+  <h2>Gêneros Disponíveis</h2>
+  <ul id="lista-generos"></ul>
 `
 
 const formLivro = document.getElementById('form-livro') as HTMLFormElement
@@ -62,5 +66,18 @@ formLivro.addEventListener('submit', async (evento) => {
   }
 })
 carregarLivros()
+
+const listaGeneros = document.getElementById('lista-generos') as HTMLUListElement
+
+async function carregarGeneros() {
+  try {
+    const generos = await window.api.listarGeneros()
+    listaGeneros.innerHTML = generos.map((genero) => `<li>${genero}</li>`).join('')
+  } catch (erro) {
+    listaGeneros.innerHTML = '<li>Erro ao carregar gêneros.</li>'
+    console.error(erro)
+  }
+}
+carregarGeneros()
 
 export {}

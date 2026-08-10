@@ -95,7 +95,7 @@ app.on('before-quit', async () => {
   console.log('Fechando a conexao com o banco de dados')
 })
 
-// Manipulador IPC Exemplo
+
 ipcMain.handle('canal-ping', async () => {
   return 'pong do processo principal!'
 })
@@ -124,4 +124,7 @@ ipcMain.handle('livros:cadastrar', async (_evento, livro: {titulo: string, autor
   }
 })
 
+ipcMain.handle('listar-generos', async (): Promise<string[]> => {
+  return ['Romance', 'Ficção Científica', 'Fantasia', 'Biografia', 'Técnico']
+})
 
