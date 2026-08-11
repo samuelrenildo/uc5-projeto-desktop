@@ -12,8 +12,8 @@ declare global {
   interface Window {
     api: {
       ping: () => Promise<string>;
-      listarLivros: () => Promise<Livro[]>
-      cadastrarLivros: (livro: {titulo: string, autor: string, isbn: string}) => Promise<Livro>
+      listarLivros: () => Promise<Livro[]>;
+      cadastrarLivros: (livro: {titulo: string, autor: string, isbn: string}) => Promise<Livro>;
       listarGeneros: () => Promise<string[]>
     };
   }
