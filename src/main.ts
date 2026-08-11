@@ -114,7 +114,7 @@ ipcMain.handle('livros:listar', async () => {
 ipcMain.handle('livros:cadastrar', async (_evento, livro: {titulo: string, autor: string, isbn: string}) => {
   try {
     const resultado = await pool.query(
-      'insert into (titulo, autor, isbn) values ($1, $2, $3) returning *',
+      'insert into livros (titulo, autor, isbn) values ($1, $2, $3) returning *',
       [livro.titulo, livro.autor, livro.isbn]
     )
     return resultado.rows[0]

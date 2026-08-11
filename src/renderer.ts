@@ -1,11 +1,19 @@
 import './style.css'
 
+interface Livro {
+  id: number
+  titulo: string
+  autor: string
+  isbn: string
+  disponivel: boolean
+}
+
 declare global {
   interface Window {
     api: {
       ping: () => Promise<string>;
-      listarLivros: () => Promise<any[]>
-      cadastrarLivros: (livro: {titulo: string, autor: string, isbn: string}) => Promise<any>
+      listarLivros: () => Promise<Livro[]>
+      cadastrarLivros: (livro: {titulo: string, autor: string, isbn: string}) => Promise<Livro>
       listarGeneros: () => Promise<string[]>
     };
   }
