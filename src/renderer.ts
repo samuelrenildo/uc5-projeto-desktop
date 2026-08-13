@@ -8,6 +8,13 @@ interface Livro {
   disponivel: boolean
 }
 
+interface Leitor {
+  id: number
+  nome: string
+  matricula: string
+  telefone: string
+}
+
 declare global {
   interface Window {
     api: {
@@ -15,6 +22,8 @@ declare global {
       listarLivros: () => Promise<Livro[]>;
       cadastrarLivros: (livro: {titulo: string, autor: string, isbn: string}) => Promise<Livro>;
       listarGeneros: () => Promise<string[]>
+      listarLeitores: () => Promise<Leitor[]>,
+      cadastrarLeitor: (leitor: {nome: string, matricula: string, telefone: string}) => Promise<Leitor>;
     };
   }
 }
@@ -38,6 +47,18 @@ appElement.innerHTML = `
 
   <h2>Gêneros Disponíveis</h2>
   <ul id="lista-generos"></ul>
+
+  <h2>Cadastrar Leitor</h2>
+  <form id="form-leitor">
+    <input type="text" id="nome" placeholder="Nome" required />
+    <input type="text" id="matricula" placeholder="Matrícula" required />
+    <input type="text" id="telefone" placeholder="Telefone" required />
+    <button type="submit">Cadastrar</button>
+  </form>
+  <p id="mensagem-leitor"></p>
+
+  <h2>Leitores Cadastrados</h2>
+  <ul id="lista-leitores"></ul>
 `
 
 const formLivro = document.getElementById('form-livro') as HTMLFormElement
@@ -87,5 +108,8 @@ async function carregarGeneros() {
   }
 }
 carregarGeneros()
+
+const formLeitor = document.getElementById('form-leitor') as HTMLFormElement
+const 
 
 export {}

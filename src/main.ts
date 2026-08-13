@@ -128,3 +128,25 @@ ipcMain.handle('listar-generos', async (): Promise<string[]> => {
   return ['Romance', 'Ficção Científica', 'Fantasia', 'Biografia', 'Técnico']
 })
 
+ipcMain.handle('leitores:listar', async () => {
+  try {
+    const resultado = await pool.query('SELECT * from leitores order by id')
+    return resultado.rows[0]
+  } catch (erro) {
+    console.error('Erro ao listar leitore:', erro)
+    throw erro
+  }
+})
+
+ipcMain.handle('leitores:cadastrar', async (_evento, leitor: {nome: string, matricula: string, telefone: string}) => {
+  try {
+    const resultado = await pool.query(
+      'insert into leitores (nome, matricula, telefone) values ($1, $2, $3) returning *',
+      [leitor.nome, leitor.matricula, leitor.telefone]
+    )
+    return resultado.rows[0]
+  } catch (erro) {
+    console.error('Erro ao cadastrar os leitores:', erro)
+    throw erro
+  }
+})
