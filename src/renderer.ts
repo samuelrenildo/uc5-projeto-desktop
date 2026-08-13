@@ -110,6 +110,39 @@ async function carregarGeneros() {
 carregarGeneros()
 
 const formLeitor = document.getElementById('form-leitor') as HTMLFormElement
-const 
+const mensagemLeitor = document.getElementById('mensagem-leitor') as HTMLParagraphElement
+const listaLeitores = document.getElementById('lista-leitores') as HTMLUListElement
 
+async function carregarLeitores() {
+  try {
+    const leitores = await window.api.listarLeitores()
+    listaLeitores.innerHTML = leitores
+      .map((leitor: Leitor) => `<li>${leitor.nome} - Matrícula: ${leitor.matricula} - Tel: ${leitor.telefone}</li>`)
+      .join('')
+  } catch (erro) {
+    listaLeitores.innerHTML = '<li>Erro ao carregar leitores</li>'
+    console.error(erro)
+  }
+}
+
+
+formLeitor.addEventListener('submit', async (evento) => {
+  evento.preventDefault()
+  
+  const nome = (document.getElementById('nome') as HTMLInputElement).value
+  const matricula = (document.getElementById('matricula') as HTMLInputElement).value
+  const telefone = (document.getElementById('telefone') as HTMLInputElement).value
+
+  try {
+    await window.api.cadastrarLeitor({nome, matricula, telefone})
+    mensagemLeitor.textContent = 'leitor cadastrado com sucesso!'
+    formLeitor.reset()
+    carregarLeitores()
+  } catch (erro) {
+    mensagemLeitor.textContent = 'Erro ao cadastrar leitor.'
+    console.error(erro)
+  }
+})
+
+carregarLeitores()
 export {}
