@@ -131,7 +131,7 @@ ipcMain.handle('listar-generos', async (): Promise<string[]> => {
 ipcMain.handle('leitores:listar', async () => {
   try {
     const resultado = await pool.query('SELECT * from leitores order by id')
-    return resultado.rows[0]
+    return resultado.rows
   } catch (erro) {
     console.error('Erro ao listar leitore:', erro)
     throw erro
