@@ -21,7 +21,7 @@ declare global {
       ping: () => Promise<string>;
       listarLivros: () => Promise<Livro[]>;
       cadastrarLivros: (livro: {titulo: string, autor: string, isbn: string}) => Promise<Livro>;
-      listarGeneros: () => Promise<string[]>
+      listarGeneros: (termo?: string) => Promise<string[]>
       listarLeitores: () => Promise<Leitor[]>,
       cadastrarLeitor: (leitor: {nome: string, matricula: string, telefone: string}) => Promise<Leitor>;
     };
@@ -44,9 +44,6 @@ appElement.innerHTML = `
 
   <h2>Livros Cadastrados</h2>
   <ul id="lista-livros"></ul>
-
-  <h2>Gêneros Disponíveis</h2>
-  <ul id="lista-generos"></ul>
 
   <h2>Cadastrar Leitor</h2>
   <form id="form-leitor">
@@ -96,17 +93,50 @@ formLivro.addEventListener('submit', async (evento) => {
 })
 carregarLivros()
 
+const formBuscaGenero = document.getElementById('form-busca-genero') as HTMLFormElement
+const campoBuscaGenero = document.getElementById('campo-busca-genero') as HTMLInputElement
+const mensagemBuscaGenero = document.getElementById('mensagem-busca-genero') as HTMLParagraphElement
 const listaGeneros = document.getElementById('lista-generos') as HTMLUListElement
 
-async function carregarGeneros() {
+function renderizarGeneros(generos: string[]) {
+  listaGeneros.innerHTML = ''
+  generos.forEach((genero) => {
+    const item = document.createElement('li')
+    item.textContent = genero
+    listaGeneros.appendChild(item)
+  })
+}
+
+async function carregarGeneros(termo?: string) {
   try {
-    const generos = await window.api.listarGeneros()
-    listaGeneros.innerHTML = generos.map((genero) => `<li>${genero}</li>`).join('')
+    const generos = await window.api.listarGeneros(termo)
+    if (generos.length === 0) {
+      mensagemBuscaGenero.textContent = 'Nenhum gênero encontrado.'
+    } else {
+      mensagemBuscaGenero.textContent = ''
+    }
+    renderizarGeneros(generos)
   } catch (erro) {
-    listaGeneros.innerHTML = '<li>Erro ao carregar gêneros.</li>'
+    mensagemBuscaGenero.textContent = 'Termo de busca inválido.'
+    renderizarGeneros([])
     console.error(erro)
   }
 }
+
+formBuscaGenero.addEventListener('submit', async (evento) => {
+  evento.preventDefault()
+  await carregarGeneros(campoBuscaGenero.value)
+})
+
+campoBuscaGenero.addEventListener('input', () => {
+  const termo = campoBuscaGenero.value.toLowerCase()
+  const itens = listaGeneros.querySelectorAll<HTMLLIElement>('li')
+  itens.forEach((item) => {
+    const texto = item.textContent?.toLowerCase() ?? ''
+    item.style.display = texto.includes(termo) ? '' : 'none'
+  })
+})
+
 carregarGeneros()
 
 const formLeitor = document.getElementById('form-leitor') as HTMLFormElement

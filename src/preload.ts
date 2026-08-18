@@ -5,7 +5,7 @@ contextBridge.exposeInMainWorld('api', {
   listarLivros: () => ipcRenderer.invoke('livros:listar'),
   cadastrarLivros: (livro: {titulo: string, autor: string, isbn: string}) => 
     ipcRenderer.invoke('livros:cadastrar', livro),
-  listarGeneros: (): Promise<string[]> => ipcRenderer.invoke('listar-generos'),
+  listarGeneros: (termo?: string): Promise<string[]> => ipcRenderer.invoke('listar-generos', termo),
   listarLeitores: () => ipcRenderer.invoke('leitores:listar'),
   cadastrarLeitor: (leitor: {nome: string, matricula: string, telefone: string}) =>
     ipcRenderer.invoke('leitores:cadastrar', leitor)

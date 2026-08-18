@@ -124,8 +124,26 @@ ipcMain.handle('livros:cadastrar', async (_evento, livro: {titulo: string, autor
   }
 })
 
-ipcMain.handle('listar-generos', async (): Promise<string[]> => {
-  return ['Romance', 'Ficção Científica', 'Fantasia', 'Biografia', 'Técnico']
+const generosDisponiveis = ['Romance', 'Ficção Científica', 'Fantasia', 'Biografia', 'Técnico']
+
+ipcMain.handle('listar-generos', async (_evento, termo?: string): Promise<string[]> => {
+  if (termo === undefined) {
+    return generosDisponiveis
+  }
+
+  const termoLimpo = termo.trim()
+
+  if (/\d/.test(termoLimpo)) {
+    throw new Error('Termo de busca inválido: não utilize números.')
+  }
+
+  if (termoLimpo === '') {
+    return generosDisponiveis
+  }
+
+  return generosDisponiveis.filter((genero) =>
+    genero.toLowerCase().includes(termoLimpo.toLowerCase())
+  )
 })
 
 ipcMain.handle('leitores:listar', async () => {
